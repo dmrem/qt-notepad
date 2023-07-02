@@ -22,18 +22,6 @@ public:
 
     void openCurrentFile();
 
-private slots:
-
-    void slotNew();
-
-    void slotOpen();
-
-    void slotSave();
-
-    void slotSaveAs();
-
-    void slotExit();
-
 private:
 
     Ui::MainWindow* ui;
@@ -46,6 +34,18 @@ private:
     bool showSaveDialog();
 
     bool showOpenDialog();
+
+private slots:
+
+    void slotNew();
+
+    void slotOpen();
+
+    void slotSave();
+
+    void slotSaveAs();
+
+    void slotExit();
 
 };
 

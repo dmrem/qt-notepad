@@ -1,5 +1,6 @@
 #include <QFileDialog>
 #include <QStandardPaths>
+#include <QMessageBox>
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
@@ -122,14 +123,6 @@ void MainWindow::createNewFile() {
     updateTitleBar();
 }
 
-void MainWindow::openCurrentFile() {
-    qDebug() << currentFile;
-}
-
-void MainWindow::saveCurrentFile() {
-    qDebug() << currentFile;
-}
-
 void MainWindow::updateTitleBar() {
     if ( currentFile.isEmpty() ) {
         setWindowTitle( "Editor - New File" );
@@ -137,4 +130,23 @@ void MainWindow::updateTitleBar() {
     else {
         setWindowTitle( "Editor - " + currentFile );
     }
+}
+
+void MainWindow::openCurrentFile() {
+    QFile file( currentFile );
+    if ( file.open( QIODevice::ReadOnly | QIODevice::Text ) ) {
+        ui->mainTextArea->setText( QString( file.readAll() ) );
+    }
+    file.close();
+}
+
+void MainWindow::saveCurrentFile() {
+    QFile file( currentFile );
+    if ( file.open( QIODevice::WriteOnly | QIODevice::Text ) ) {
+        file.write( ui->mainTextArea->toPlainText().toUtf8() );
+    }
+    else {
+        QMessageBox::critical( this, "Error", "Could not save file" );
+    }
+    file.close();
 }
