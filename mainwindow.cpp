@@ -1,3 +1,5 @@
+#include <QFileDialog>
+#include <QStandardPaths>
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
@@ -53,14 +55,24 @@ void MainWindow::slotNew() {
 }
 
 void MainWindow::slotOpen() {
-
+    if ( showOpenDialog() ) {
+        openCurrentFile();
+    }
 }
 
 void MainWindow::slotSave() {
-
+    if ( currentFile.isEmpty() ) {
+        slotSaveAs();
+    }
+    else {
+        saveCurrentFile();
+    }
 }
 
 void MainWindow::slotSaveAs() {
+    if ( showSaveDialog() ) {
+        saveCurrentFile();
+    }
 
 }
 
@@ -68,14 +80,54 @@ void MainWindow::slotExit() {
     QCoreApplication::exit();
 }
 
-void MainWindow::createNewFile() {
-    ui->mainTextArea->clear();
-    currentFile = "";
+void MainWindow::setCurrentFile( const QString &filePath ) {
+    currentFile = filePath;
     updateTitleBar();
 }
 
-void MainWindow::openFile(QString fileName) {
+bool MainWindow::showOpenDialog() {
+    QFileDialog dialog( this );
+    dialog.setDirectory( QStandardPaths::standardLocations( QStandardPaths::DesktopLocation ).constFirst() );
+    dialog.setOption( QFileDialog::DontConfirmOverwrite );
+    dialog.setAcceptMode( QFileDialog::AcceptOpen );
+    dialog.setFileMode( QFileDialog::AnyFile );
 
+    if ( dialog.exec() ) {
+        setCurrentFile( dialog.selectedFiles().constFirst() );
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+bool MainWindow::showSaveDialog() {
+    QFileDialog dialog( this );
+    dialog.setDirectory( QStandardPaths::standardLocations( QStandardPaths::DesktopLocation ).constFirst() );
+    dialog.setAcceptMode( QFileDialog::AcceptSave );
+    dialog.setFileMode( QFileDialog::AnyFile );
+
+    if ( dialog.exec() ) {
+        setCurrentFile( dialog.selectedFiles().constFirst() );
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
+void MainWindow::createNewFile() {
+    ui->mainTextArea->clear();
+    setCurrentFile( "" );
+    updateTitleBar();
+}
+
+void MainWindow::openCurrentFile() {
+    qDebug() << currentFile;
+}
+
+void MainWindow::saveCurrentFile() {
+    qDebug() << currentFile;
 }
 
 void MainWindow::updateTitleBar() {

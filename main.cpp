@@ -10,7 +10,8 @@ int main( int argc, char* argv[] ) {
 
     QStringList arguments = QCoreApplication::arguments();
     if ( arguments.length() > 1 ) {
-        w.openFile(arguments.at(1));
+        w.setCurrentFile( arguments.at( 1 ) );
+        w.openCurrentFile();
     }
     else {
         w.createNewFile();

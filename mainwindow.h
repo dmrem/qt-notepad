@@ -11,13 +11,16 @@ class MainWindow : public QMainWindow {
 Q_OBJECT
 
 public:
+
     MainWindow( QWidget* parent = nullptr );
 
     ~MainWindow();
 
+    void setCurrentFile( const QString &filePath );
+
     void createNewFile();
 
-    void openFile( QString fileName );
+    void openCurrentFile();
 
 private slots:
 
@@ -32,11 +35,18 @@ private slots:
     void slotExit();
 
 private:
-    Ui::MainWindow* ui;
 
+    Ui::MainWindow* ui;
     QString currentFile;
 
     void updateTitleBar();
+
+    void saveCurrentFile();
+
+    bool showSaveDialog();
+
+    bool showOpenDialog();
+
 };
 
 #endif // MAINWINDOW_H
