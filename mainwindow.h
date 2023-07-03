@@ -2,6 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QMessageBox>
+#include <QShortcut>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -11,7 +13,6 @@ class MainWindow : public QMainWindow {
 Q_OBJECT
 
 // todo: support for multiple buffers via tabs
-// todo: add keyboard shortcuts
 public:
 
     MainWindow( QWidget* parent = nullptr );
@@ -41,6 +42,8 @@ private:
     Ui::MainWindow* ui;
     QString currentFile;
     bool changedSinceLastSave;
+
+    QShortcut newShortcut, openShortcut, saveShortcut, saveAsShortcut;
 
     /**
      * Update the title bar to contain the path to the current file, if any.

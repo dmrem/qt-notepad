@@ -7,10 +7,15 @@
 MainWindow::MainWindow( QWidget* parent )
     : QMainWindow( parent ),
       ui( new Ui::MainWindow ),
+      newShortcut( QKeySequence( "Ctrl+N" ), this, this, &MainWindow::slotNew ),
+      openShortcut( QKeySequence( "Ctrl+O" ), this, this, &MainWindow::slotOpen ),
+      saveShortcut( QKeySequence( "Ctrl+S" ), this, this, &MainWindow::slotSave ),
+      saveAsShortcut( QKeySequence( "Ctrl+Shift+S" ), this, this, &MainWindow::slotSaveAs ),
       currentFile( "" ),
       changedSinceLastSave( false ) {
 
     ui->setupUi( this );
+
 
     QApplication::connect(
         ui->actionNew, &QAction::triggered,
