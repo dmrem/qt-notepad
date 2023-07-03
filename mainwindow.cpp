@@ -43,8 +43,15 @@ MainWindow::MainWindow( QWidget* parent )
         SLOT( slotExit() )
     );
 
-    currentFile = "";
+    QApplication::connect(
+        ui->mainTextArea,
+        SIGNAL( textChanged() ),
+        this,
+        SLOT( slotBufferChanged() )
+    );
 
+    currentFile = "";
+    changedSinceLastSave = false;
 }
 
 MainWindow::~MainWindow() {
@@ -79,6 +86,13 @@ void MainWindow::slotSaveAs() {
 
 void MainWindow::slotExit() {
     QCoreApplication::exit();
+}
+
+void MainWindow::slotBufferChanged() {
+    if ( !changedSinceLastSave ) {
+        setChangedSinceLastSave( true );
+        updateTitleBar();
+    }
 }
 
 void MainWindow::setCurrentFile( const QString &filePath ) {
@@ -119,23 +133,30 @@ bool MainWindow::showSaveDialog() {
 
 void MainWindow::createNewFile() {
     ui->mainTextArea->clear();
+    setChangedSinceLastSave( false );
     setCurrentFile( "" );
     updateTitleBar();
 }
 
 void MainWindow::updateTitleBar() {
-    if ( currentFile.isEmpty() ) {
-        setWindowTitle( "Editor - New File" );
-    }
-    else {
-        setWindowTitle( "Editor - " + currentFile );
-    }
+    QString titleString;
+    QTextStream stream( &titleString );
+
+    stream << ( changedSinceLastSave ? "*" : "" ) << "Editor - "
+        << ( currentFile.isEmpty() ? "New File" : currentFile );
+    setWindowTitle( titleString );
+}
+
+void MainWindow::setChangedSinceLastSave( bool value ) {
+    changedSinceLastSave = value;
+    updateTitleBar();
 }
 
 void MainWindow::openCurrentFile() {
     QFile file( currentFile );
     if ( file.open( QIODevice::ReadOnly | QIODevice::Text ) ) {
         ui->mainTextArea->setText( QString( file.readAll() ) );
+        setChangedSinceLastSave( false );
     }
     file.close();
 }
@@ -144,6 +165,7 @@ void MainWindow::saveCurrentFile() {
     QFile file( currentFile );
     if ( file.open( QIODevice::WriteOnly | QIODevice::Text ) ) {
         file.write( ui->mainTextArea->toPlainText().toUtf8() );
+        setChangedSinceLastSave( false );
     }
     else {
         QMessageBox::critical( this, "Error", "Could not save file" );

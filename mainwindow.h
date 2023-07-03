@@ -12,7 +12,7 @@ Q_OBJECT
 
 // todo: keep track if the file is saved, add "do you want to save" dialog when exiting or creating a new file if it isn't
 // todo: support for multiple buffers via tabs
-
+// todo: add keyboard shortcuts
 public:
 
     MainWindow( QWidget* parent = nullptr );
@@ -41,11 +41,19 @@ private:
 
     Ui::MainWindow* ui;
     QString currentFile;
+    bool changedSinceLastSave;
 
     /**
      * Update the title bar to contain the path to the current file, if any.
      */
     void updateTitleBar();
+
+    /**
+     * Update whether the buffer has unsaved changes, and trigger an update to everything that
+     * uses that info.
+     * @param value
+     */
+    void setChangedSinceLastSave( bool value );
 
     /**
      * Opens the file referred to by the path stored in currentFile, creating it if necessary. Copies the text
@@ -86,6 +94,8 @@ private slots:
     // called when the user clicks file->exit
     void slotExit();
 
+    // called when the user types something in the buffer
+    void slotBufferChanged();
 };
 
 #endif // MAINWINDOW_H
