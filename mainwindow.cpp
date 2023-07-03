@@ -59,18 +59,116 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::slotNew() {
+    if ( changedSinceLastSave ) {
+        QMessageBox::StandardButton button = QMessageBox::question(
+            this,
+            "Editor",
+            "You have unsaved changes. Do you want to save?",
+            QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No | QMessageBox::StandardButton::Cancel,
+            QMessageBox::StandardButton::Cancel
+        );
+
+        switch ( button ) {
+            case QMessageBox::StandardButton::Yes:
+                if ( currentFile.isEmpty() ) {
+                    if ( showSaveDialog() ) {
+                        saveCurrentFile();
+                    }
+                    else {
+                        return;
+                    }
+                }
+                else {
+                    saveCurrentFile();
+                }
+                break;
+            case QMessageBox::StandardButton::No:
+                // do nothing, proceed directly to creating new file
+                break;
+            default:
+                // do nothing and don't save
+                return;
+        }
+    }
+
     createNewFile();
 }
 
 void MainWindow::slotOpen() {
+    if ( changedSinceLastSave ) {
+        QMessageBox::StandardButton button = QMessageBox::question(
+            this,
+            "Editor",
+            "You have unsaved changes. Do you want to save?",
+            QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No | QMessageBox::StandardButton::Cancel,
+            QMessageBox::StandardButton::Cancel
+        );
+
+        switch ( button ) {
+            case QMessageBox::StandardButton::Yes:
+                if ( currentFile.isEmpty() ) {
+                    if ( showSaveDialog() ) {
+                        saveCurrentFile();
+                    }
+                    else {
+                        return;
+                    }
+                }
+                else {
+                    saveCurrentFile();
+                }
+                break;
+            case QMessageBox::StandardButton::No:
+                // do nothing, proceed directly to opening file
+                break;
+            default:
+                // do nothing and don't open
+                return;
+        }
+    }
+
     if ( showOpenDialog() ) {
         openCurrentFile();
     }
 }
 
 void MainWindow::slotSave() {
+    if ( changedSinceLastSave ) {
+        QMessageBox::StandardButton button = QMessageBox::question(
+            this,
+            "Editor",
+            "You have unsaved changes. Do you want to save?",
+            QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No | QMessageBox::StandardButton::Cancel,
+            QMessageBox::StandardButton::Cancel
+        );
+
+        switch ( button ) {
+            case QMessageBox::StandardButton::Yes:
+                if ( currentFile.isEmpty() ) {
+                    if ( showSaveDialog() ) {
+                        saveCurrentFile();
+                    }
+                    else {
+                        return;
+                    }
+                }
+                else {
+                    saveCurrentFile();
+                }
+                break;
+            case QMessageBox::StandardButton::No:
+                // do nothing, proceed directly to saving
+                break;
+            default:
+                // do nothing and don't save
+                return;
+        }
+    }
+
     if ( currentFile.isEmpty() ) {
-        slotSaveAs();
+        if ( showSaveDialog() ) {
+            saveCurrentFile();
+        }
     }
     else {
         saveCurrentFile();
