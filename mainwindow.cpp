@@ -10,44 +10,44 @@ MainWindow::MainWindow( QWidget* parent )
 
     QApplication::connect(
         ui->actionNew,
-        SIGNAL( triggered() ),
+        &QAction::triggered,
         this,
-        SLOT( slotNew() )
+        &MainWindow::slotNew
     );
 
     QApplication::connect(
         ui->actionOpen,
-        SIGNAL( triggered() ),
+        &QAction::triggered,
         this,
-        SLOT( slotOpen() )
+        &MainWindow::slotOpen
     );
 
     QApplication::connect(
         ui->actionSave,
-        SIGNAL( triggered() ),
+        &QAction::triggered,
         this,
-        SLOT( slotSave() )
+        &MainWindow::slotSave
     );
 
     QApplication::connect(
         ui->actionSaveAs,
-        SIGNAL( triggered() ),
+        &QAction::triggered,
         this,
-        SLOT( slotSaveAs() )
+        &MainWindow::slotSaveAs
     );
 
     QApplication::connect(
         ui->actionExit,
-        SIGNAL( triggered() ),
+        &QAction::triggered,
         this,
-        SLOT( slotExit() )
+        &MainWindow::slotExit
     );
 
     QApplication::connect(
         ui->mainTextArea,
-        SIGNAL( textChanged() ),
+        &QTextEdit::textChanged,
         this,
-        SLOT( slotBufferChanged() )
+        &MainWindow::slotBufferChanged
     );
 
     currentFile = "";
@@ -60,16 +60,8 @@ MainWindow::~MainWindow() {
 
 void MainWindow::slotNew() {
     if ( changedSinceLastSave ) {
-        QMessageBox::StandardButton button = QMessageBox::question(
-            this,
-            "Editor",
-            "You have unsaved changes. Do you want to save?",
-            QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No | QMessageBox::StandardButton::Cancel,
-            QMessageBox::StandardButton::Cancel
-        );
-
-        switch ( button ) {
-            case QMessageBox::StandardButton::Yes:
+        switch ( showSaveConfirmationDialog() ) {
+            case QMessageBox::Yes:
                 if ( currentFile.isEmpty() ) {
                     if ( showSaveDialog() ) {
                         saveCurrentFile();
@@ -82,7 +74,7 @@ void MainWindow::slotNew() {
                     saveCurrentFile();
                 }
                 break;
-            case QMessageBox::StandardButton::No:
+            case QMessageBox::No:
                 // do nothing, proceed directly to creating new file
                 break;
             default:
@@ -96,16 +88,8 @@ void MainWindow::slotNew() {
 
 void MainWindow::slotOpen() {
     if ( changedSinceLastSave ) {
-        QMessageBox::StandardButton button = QMessageBox::question(
-            this,
-            "Editor",
-            "You have unsaved changes. Do you want to save?",
-            QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No | QMessageBox::StandardButton::Cancel,
-            QMessageBox::StandardButton::Cancel
-        );
-
-        switch ( button ) {
-            case QMessageBox::StandardButton::Yes:
+        switch ( showSaveConfirmationDialog() ) {
+            case QMessageBox::Yes:
                 if ( currentFile.isEmpty() ) {
                     if ( showSaveDialog() ) {
                         saveCurrentFile();
@@ -118,7 +102,7 @@ void MainWindow::slotOpen() {
                     saveCurrentFile();
                 }
                 break;
-            case QMessageBox::StandardButton::No:
+            case QMessageBox::No:
                 // do nothing, proceed directly to opening file
                 break;
             default:
@@ -133,38 +117,6 @@ void MainWindow::slotOpen() {
 }
 
 void MainWindow::slotSave() {
-    if ( changedSinceLastSave ) {
-        QMessageBox::StandardButton button = QMessageBox::question(
-            this,
-            "Editor",
-            "You have unsaved changes. Do you want to save?",
-            QMessageBox::StandardButton::Yes | QMessageBox::StandardButton::No | QMessageBox::StandardButton::Cancel,
-            QMessageBox::StandardButton::Cancel
-        );
-
-        switch ( button ) {
-            case QMessageBox::StandardButton::Yes:
-                if ( currentFile.isEmpty() ) {
-                    if ( showSaveDialog() ) {
-                        saveCurrentFile();
-                    }
-                    else {
-                        return;
-                    }
-                }
-                else {
-                    saveCurrentFile();
-                }
-                break;
-            case QMessageBox::StandardButton::No:
-                // do nothing, proceed directly to saving
-                break;
-            default:
-                // do nothing and don't save
-                return;
-        }
-    }
-
     if ( currentFile.isEmpty() ) {
         if ( showSaveDialog() ) {
             saveCurrentFile();
@@ -179,7 +131,6 @@ void MainWindow::slotSaveAs() {
     if ( showSaveDialog() ) {
         saveCurrentFile();
     }
-
 }
 
 void MainWindow::slotExit() {
@@ -196,6 +147,16 @@ void MainWindow::slotBufferChanged() {
 void MainWindow::setCurrentFile( const QString &filePath ) {
     currentFile = filePath;
     updateTitleBar();
+}
+
+QMessageBox::StandardButton MainWindow::showSaveConfirmationDialog() {
+    return QMessageBox::question(
+        this,
+        "Editor",
+        "You have unsaved changes. Do you want to save?",
+        QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel,
+        QMessageBox::Cancel
+    );
 }
 
 bool MainWindow::showOpenDialog() {

@@ -10,7 +10,6 @@ QT_END_NAMESPACE
 class MainWindow : public QMainWindow {
 Q_OBJECT
 
-// todo: keep track if the file is saved, add "do you want to save" dialog when exiting or creating a new file if it isn't
 // todo: support for multiple buffers via tabs
 // todo: add keyboard shortcuts
 public:
@@ -60,6 +59,12 @@ private:
      * from the buffer into the file, then closes it. Creates a message box on error.
      */
     void saveCurrentFile();
+
+    /**
+     * Opens a dialog window asking the user if they want to save their unsaved changes
+     * @return The button the user pressed to exit the window.
+     */
+    QMessageBox::StandardButton showSaveConfirmationDialog();
 
     /**
      * Opens a dialog window which allows the user to choose the filename for saving. If the user chose
