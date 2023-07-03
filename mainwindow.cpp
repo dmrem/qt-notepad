@@ -5,53 +5,43 @@
 #include "./ui_mainwindow.h"
 
 MainWindow::MainWindow( QWidget* parent )
-    : QMainWindow( parent ), ui( new Ui::MainWindow ) {
+    : QMainWindow( parent ),
+      ui( new Ui::MainWindow ),
+      currentFile( "" ),
+      changedSinceLastSave( false ) {
+
     ui->setupUi( this );
 
     QApplication::connect(
-        ui->actionNew,
-        &QAction::triggered,
-        this,
-        &MainWindow::slotNew
+        ui->actionNew, &QAction::triggered,
+        this, &MainWindow::slotNew
     );
 
     QApplication::connect(
-        ui->actionOpen,
-        &QAction::triggered,
-        this,
-        &MainWindow::slotOpen
+        ui->actionOpen, &QAction::triggered,
+        this, &MainWindow::slotOpen
     );
 
     QApplication::connect(
-        ui->actionSave,
-        &QAction::triggered,
-        this,
-        &MainWindow::slotSave
+        ui->actionSave, &QAction::triggered,
+        this, &MainWindow::slotSave
     );
 
     QApplication::connect(
-        ui->actionSaveAs,
-        &QAction::triggered,
-        this,
-        &MainWindow::slotSaveAs
+        ui->actionSaveAs, &QAction::triggered,
+        this, &MainWindow::slotSaveAs
     );
 
     QApplication::connect(
-        ui->actionExit,
-        &QAction::triggered,
-        this,
-        &MainWindow::slotExit
+        ui->actionExit, &QAction::triggered,
+        this, &MainWindow::slotExit
     );
 
     QApplication::connect(
-        ui->mainTextArea,
-        &QTextEdit::textChanged,
-        this,
-        &MainWindow::slotBufferChanged
+        ui->mainTextArea, &QTextEdit::textChanged,
+        this, &MainWindow::slotBufferChanged
     );
 
-    currentFile = "";
-    changedSinceLastSave = false;
 }
 
 MainWindow::~MainWindow() {
