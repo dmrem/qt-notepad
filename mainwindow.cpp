@@ -6,7 +6,6 @@
 #include "TextBuffer.h"
 
 //todo: add signal for current file changing, add slots to update title bar and tab label
-//todo: make the tab close buttons work
 //todo: clean up commented out code
 
 MainWindow::MainWindow( QWidget* parent )
@@ -19,34 +18,39 @@ MainWindow::MainWindow( QWidget* parent )
 
     ui->setupUi( this );
 
-    QApplication::connect(
+    connect(
         ui->actionNew, &QAction::triggered,
         this, &MainWindow::slotNew
     );
 
-    QApplication::connect(
+    connect(
         ui->actionOpen, &QAction::triggered,
         this, &MainWindow::slotOpen
     );
 
-    QApplication::connect(
+    connect(
         ui->actionSave, &QAction::triggered,
         this, &MainWindow::slotSave
     );
 
-    QApplication::connect(
+    connect(
         ui->actionSaveAs, &QAction::triggered,
         this, &MainWindow::slotSaveAs
     );
 
-    QApplication::connect(
+    connect(
         ui->actionExit, &QAction::triggered,
         this, &MainWindow::slotExit
     );
 
-    QApplication::connect(
+    connect(
         ui->tabWidget, &QTabWidget::currentChanged,
         this, &MainWindow::updateTitleBar
+    );
+
+    connect(
+        ui->tabWidget, &QTabWidget::tabCloseRequested,
+        this, &MainWindow::slotCloseTab
     );
 
 }
@@ -56,58 +60,10 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::slotNew() {
-    // move this to close tab button
-//    if ( changedSinceLastSave ) {
-//        switch ( showSaveConfirmationDialog() ) {
-//            case QMessageBox::Yes:
-//                if ( currentFile.isEmpty() ) {
-//                    if ( showSaveDialog() ) {
-//                        saveCurrentFile();
-//                    }
-//                    else {
-//                        return;
-//                    }
-//                }
-//                else {
-//                    saveCurrentFile();
-//                }
-//                break;
-//            case QMessageBox::No:
-//                // do nothing, proceed directly to creating new file
-//                break;
-//            default:
-//                // do nothing and don't save
-//                return;
-//        }
-//    }
-
     createNewFile();
 }
 
 void MainWindow::slotOpen() {
-//    if ( changedSinceLastSave ) {
-//        switch ( showSaveConfirmationDialog() ) {
-//            case QMessageBox::Yes:
-//                if ( currentFile.isEmpty() ) {
-//                    if ( showSaveDialog() ) {
-//                        saveCurrentFile();
-//                    }
-//                    else {
-//                        return;
-//                    }
-//                }
-//                else {
-//                    saveCurrentFile();
-//                }
-//                break;
-//            case QMessageBox::No:
-//                // do nothing, proceed directly to opening file
-//                break;
-//            default:
-//                // do nothing and don't open
-//                return;
-//        }
-//    }
 
     QString selectedFile = showOpenDialog();
     if ( selectedFile == "" ) {
@@ -163,6 +119,47 @@ void MainWindow::slotExit() {
 //        updateTitleBar();
 //    }
 //}
+
+void MainWindow::slotCloseTab( int index ) {
+    TextBuffer* bufferToClose = static_cast<TextBuffer*>(ui->tabWidget->widget( index ));
+    if ( bufferToClose == nullptr ) {
+        return;
+    }
+
+    if ( bufferToClose->isChangedSinceLastSave() ) {
+        switch ( showSaveConfirmationDialog() ) {
+            case QMessageBox::Yes:
+                if ( bufferToClose->getCurrentFile().isEmpty() ) {
+                    QString savePath = showSaveDialog();
+                    if ( savePath != "" ) {
+                        bufferToClose->setCurrentFile( savePath );
+                        bufferToClose->saveCurrentFile();
+                    }
+                    else {
+                        return;
+                    }
+                }
+                else {
+                    bufferToClose->saveCurrentFile();
+                }
+                break;
+            case QMessageBox::No:
+                // do nothing, proceed directly to closing tab
+                break;
+            default:
+                // do nothing and don't close
+                return;
+        }
+    }
+
+    // the program crashes if there isn't a different tab to show after the current is deleted
+    if ( ui->tabWidget->count() <= 1 ) {
+        createNewFile();
+    }
+
+    ui->tabWidget->removeTab( index );
+    delete bufferToClose;
+}
 
 QMessageBox::StandardButton MainWindow::showSaveConfirmationDialog() {
     return QMessageBox::question(

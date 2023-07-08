@@ -72,4 +72,7 @@ private slots:
 
     // called when the user types something in the buffer
 //    void slotBufferChanged();
+
+    // called when a tab should be closed
+    void slotCloseTab( int index );
 };

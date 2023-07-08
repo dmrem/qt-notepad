@@ -30,7 +30,6 @@ void TextBuffer::openCurrentFile() {
         this->setText( QString( file.readAll() ) );
         setChangedSinceLastSave( false );
     }
-    file.close();
 }
 
 void TextBuffer::saveCurrentFile() {
@@ -42,6 +41,5 @@ void TextBuffer::saveCurrentFile() {
     else {
         QMessageBox::critical( this, "Error", "Could not save file" );
     }
-    file.close();
 }
 
