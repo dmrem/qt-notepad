@@ -31,17 +31,23 @@
      <number>0</number>
     </property>
     <item>
-     <layout class="QFormLayout" name="formLayout">
-      <property name="horizontalSpacing">
-       <number>0</number>
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="tabShape">
+       <enum>QTabWidget::Rounded</enum>
       </property>
-      <property name="verticalSpacing">
-       <number>0</number>
+      <property name="elideMode">
+       <enum>Qt::ElideLeft</enum>
       </property>
-      <item row="0" column="0" colspan="2">
-       <widget class="QTextEdit" name="mainTextArea"/>
-      </item>
-     </layout>
+      <property name="tabsClosable">
+       <bool>true</bool>
+      </property>
+      <property name="movable">
+       <bool>true</bool>
+      </property>
+      <property name="tabBarAutoHide">
+       <bool>true</bool>
+      </property>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -51,7 +57,7 @@
      <x>0</x>
      <y>0</y>
      <width>876</width>
-     <height>22</height>
+     <height>34</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

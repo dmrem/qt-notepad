@@ -1,5 +1,4 @@
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#pragma once
 
 #include <QMainWindow>
 #include <QMessageBox>
@@ -20,29 +19,13 @@ public:
     ~MainWindow();
 
     /**
-     * Set the currently active file, and update the title bar.
-     * The currently active file is used when clicking save, to know where to save the file.
-     * @param filePath The path.
-     */
-    void setCurrentFile( const QString &filePath );
-
-    /**
      * Clear the buffer, and clear the currently active file.
      */
     void createNewFile();
 
-    /**
-     * Finds the file referred to by the path stored in currentFile, and opens it. Then reads the contents
-     * into the buffer, and closes the file.
-     */
-    void openCurrentFile();
-
 private:
 
     Ui::MainWindow* ui;
-    QString currentFile;
-    bool changedSinceLastSave;
-
     QShortcut newShortcut, openShortcut, saveShortcut, saveAsShortcut;
 
     /**
@@ -51,39 +34,24 @@ private:
     void updateTitleBar();
 
     /**
-     * Update whether the buffer has unsaved changes, and trigger an update to everything that
-     * uses that info.
-     * @param value
-     */
-    void setChangedSinceLastSave( bool value );
-
-    /**
-     * Opens the file referred to by the path stored in currentFile, creating it if necessary. Copies the text
-     * from the buffer into the file, then closes it. Creates a message box on error.
-     */
-    void saveCurrentFile();
-
-    /**
      * Opens a dialog window asking the user if they want to save their unsaved changes
      * @return The button the user pressed to exit the window.
      */
     QMessageBox::StandardButton showSaveConfirmationDialog();
 
     /**
-     * Opens a dialog window which allows the user to choose the filename for saving. If the user chose
-     * multiple files, only the first one is used.
-     * @return True if the user successfully chose a path, and false if the user clicked cancel. The return value
-     * is independent of whether or not the file can actually be accessed or created.
-     */
-    bool showSaveDialog();
-
-    /**
      * Opens a dialog window which allows the user to choose the file to be opened. If the user chose
      * multiple files, only the first one is used.
-     * @return True if the user successfully chose a path, and false if the user clicked cancel. The return value
-     * is independent of whether or not the file can actually be opened.
+     * @return The path to the file that the user chose. If the user did not choose a file, returns the empty string.
      */
-    bool showOpenDialog();
+    QString showOpenDialog();
+
+    /**
+     * Opens a dialog window which allows the user to choose the filename for saving. If the user chose
+     * multiple files, only the first one is used.
+     * @return The path to the file that the user chose. If the user did not choose a file, returns the empty string.
+     */
+    QString showSaveDialog();
 
 private slots:
 
@@ -103,7 +71,5 @@ private slots:
     void slotExit();
 
     // called when the user types something in the buffer
-    void slotBufferChanged();
+//    void slotBufferChanged();
 };
-
-#endif // MAINWINDOW_H
