@@ -45,6 +45,10 @@ public:
      */
     void saveCurrentFile();
 
+signals:
+
+    void headerShouldChange();
+
 private:
     QString currentFile;
     bool changedSinceLastSave;

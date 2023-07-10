@@ -6,14 +6,23 @@ TextBuffer::TextBuffer( QWidget* parent )
     : QTextEdit( parent ) {
     currentFile = "";
     changedSinceLastSave = false;
+
+    connect(
+        this, &TextBuffer::textChanged,
+        [this]() { setChangedSinceLastSave( true ); }
+    );
 }
 
 void TextBuffer::setCurrentFile( const QString& filePath ) {
     currentFile = filePath;
+    emit headerShouldChange();
 }
 
 void TextBuffer::setChangedSinceLastSave( bool changed ) {
-    changedSinceLastSave = changed;
+    if ( changedSinceLastSave != changed ) {
+        changedSinceLastSave = changed;
+        emit headerShouldChange();
+    }
 }
 
 const QString& TextBuffer::getCurrentFile() const {

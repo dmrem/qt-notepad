@@ -5,9 +5,6 @@
 #include "./ui_mainwindow.h"
 #include "TextBuffer.h"
 
-//todo: add signal for current file changing, add slots to update title bar and tab label
-//todo: clean up commented out code
-
 MainWindow::MainWindow( QWidget* parent )
     : QMainWindow( parent ),
       ui( new Ui::MainWindow ),
@@ -52,7 +49,6 @@ MainWindow::MainWindow( QWidget* parent )
         ui->tabWidget, &QTabWidget::tabCloseRequested,
         this, &MainWindow::slotCloseTab
     );
-
 }
 
 MainWindow::~MainWindow() {
@@ -60,11 +56,10 @@ MainWindow::~MainWindow() {
 }
 
 void MainWindow::slotNew() {
-    createNewFile();
+    openNewBuffer();
 }
 
 void MainWindow::slotOpen() {
-
     QString selectedFile = showOpenDialog();
     if ( selectedFile == "" ) {
         return;
@@ -77,13 +72,13 @@ void MainWindow::slotOpen() {
         buffer = currentBuffer;
     }
     else {
-        buffer = new TextBuffer( ui->tabWidget );
-        ui->tabWidget->setCurrentIndex( ui->tabWidget->addTab( buffer, selectedFile ) );
+        openNewBuffer();
+        buffer = static_cast<TextBuffer*>(ui->tabWidget->currentWidget());
     }
 
     buffer->setCurrentFile( selectedFile );
     buffer->openCurrentFile();
-
+    updateTitleBar();
 }
 
 void MainWindow::slotSave() {
@@ -112,13 +107,6 @@ void MainWindow::slotSaveAs() {
 void MainWindow::slotExit() {
     QCoreApplication::exit();
 }
-
-//void MainWindow::slotBufferChanged() {
-//    if ( !changedSinceLastSave ) {
-//        setChangedSinceLastSave( true );
-//        updateTitleBar();
-//    }
-//}
 
 void MainWindow::slotCloseTab( int index ) {
     TextBuffer* bufferToClose = static_cast<TextBuffer*>(ui->tabWidget->widget( index ));
@@ -154,7 +142,7 @@ void MainWindow::slotCloseTab( int index ) {
 
     // the program crashes if there isn't a different tab to show after the current is deleted
     if ( ui->tabWidget->count() <= 1 ) {
-        createNewFile();
+        openNewBuffer();
     }
 
     ui->tabWidget->removeTab( index );
@@ -200,10 +188,18 @@ QString MainWindow::showSaveDialog() {
     }
 }
 
-void MainWindow::createNewFile() {
+void MainWindow::openNewBuffer() {
     TextBuffer* buffer = new TextBuffer( ui->tabWidget );
 
     ui->tabWidget->setCurrentIndex( ui->tabWidget->addTab( buffer, "New File" ) );
+    connect(
+        static_cast<TextBuffer*>(ui->tabWidget->currentWidget()), &TextBuffer::headerShouldChange,
+        this, &MainWindow::updateCurrentTabLabel
+    );
+    connect(
+        static_cast<TextBuffer*>(ui->tabWidget->currentWidget()), &TextBuffer::headerShouldChange,
+        this, &MainWindow::updateTitleBar
+    );
 }
 
 void MainWindow::updateTitleBar() {
@@ -216,4 +212,15 @@ void MainWindow::updateTitleBar() {
         << "Editor - "
         << ( buffer->getCurrentFile().isEmpty() ? "New File" : buffer->getCurrentFile() );
     setWindowTitle( titleString );
+}
+
+void MainWindow::updateCurrentTabLabel() {
+    QString headerString;
+    QTextStream stream( &headerString );
+    TextBuffer* buffer = static_cast<TextBuffer*>(ui->tabWidget->currentWidget());
+
+    stream
+        << ( buffer->isChangedSinceLastSave() ? "*" : "" )
+        << ( buffer->getCurrentFile().isEmpty() ? "New File" : buffer->getCurrentFile() );
+    ui->tabWidget->setTabText( ui->tabWidget->currentIndex(), headerString );
 }

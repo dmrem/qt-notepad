@@ -11,7 +11,6 @@ QT_END_NAMESPACE
 class MainWindow : public QMainWindow {
 Q_OBJECT
 
-// todo: support for multiple buffers via tabs
 public:
 
     MainWindow( QWidget* parent = nullptr );
@@ -21,7 +20,7 @@ public:
     /**
      * Clear the buffer, and clear the currently active file.
      */
-    void createNewFile();
+    void openNewBuffer();
 
 private:
 
@@ -29,9 +28,14 @@ private:
     QShortcut newShortcut, openShortcut, saveShortcut, saveAsShortcut;
 
     /**
-     * Update the title bar to contain the path to the current file, if any.
+     * Update the title bar to contain the path to the current file of the currently selected tab, if any.
      */
     void updateTitleBar();
+
+    /**
+     * Update the label of the currently selected tab to contain the path to the current file, if any.
+     */
+    void updateCurrentTabLabel();
 
     /**
      * Opens a dialog window asking the user if they want to save their unsaved changes
@@ -69,9 +73,6 @@ private slots:
 
     // called when the user clicks file->exit
     void slotExit();
-
-    // called when the user types something in the buffer
-//    void slotBufferChanged();
 
     // called when a tab should be closed
     void slotCloseTab( int index );
